@@ -10,7 +10,7 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 
 ## [Features & Examples](example/)
 
-* Too few arguments passed to printf()
+### printf() string type not found
 
   ```cpp
     #include <stdio.h>
@@ -18,8 +18,32 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
   
     int main()
     {
-        printf("main starts\n");
-        
+        printf("print name %s \n", 5); 
+    }
+  ```
+  
+  When compiling, the result will be:
+
+  ```
+      <source>: In function 'int main()':
+      <source>:627:41: error: static assertion failed: Is a std::string! "(" "<source>" ":" "699" ")" fmt:"print name %s \n"
+        627 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+            |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+      <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
+         24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+            |                                             ^~~~~~~~~~~~
+      <source>:699:5: note: in expansion of macro 'printf'
+        699 |     printf("print name %s \n", 5);
+  ```
+
+### Too few arguments passed to printf()
+
+  ```cpp
+    #include <stdio.h>
+    #include "printfCheck.h"
+  
+    int main()
+    {        
         printf("TEST: arg %d arg %d \n", 5);
     }
   ```
@@ -34,6 +58,30 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
     608 |             static_assert(FmtFieldCounter <= ArgsSize,                              \
         |                           ~~~~~~~~~~~~~~~~^~~~~~~~~~~
   ```
+
+### Warning: Too much arguments passed
+  ```cpp
+    #include <stdio.h>
+    #include "printfCheck.h"
+  
+    int main()
+    {        
+         printf("TEST WARN: arg %d \n", 1, 2);
+    }
+  ```
+
+  Output:
+  ```
+    <source>: In constructor 'main()::WarningStruct699_0::WarningStruct699_0()':
+    <source>:173:47: warning: 'void main()::WarningStruct699_0::warnFunc(detail::false_type)' is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
+      173 |         warnFunc( detail::converter<(cond)>() );                \
+          |                                               ^
+    ...
+    <source>:699:5: note: in expansion of macro 'printf'
+      699 |     printf("TEST WARN: arg %d \n", 1, 2);
+          |     ^~~~~~
+  ```
+  The error line is found in the warning class: "WarningStruct699_0" means the warning is in the line 699
 
 ## Compiler compatibility
 
