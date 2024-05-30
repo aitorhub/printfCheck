@@ -13,29 +13,35 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 ### printf() string type not found
 
   ```cpp
-    #include <stdio.h>
-    #include "printfCheck.h"
-  
-    int main()
-    {
-        const std::string name = "John";
-        printf("print name %s \n", name);
-    }
-  ```
-  
-  When compiling, the result will be:
+#include <stdio.h>
+#include <string>
+#include "include/printfCheck.h"
 
+int main()
+{
+    const std::string name = "John";
+    printf("print name %s \n", name);
+}
   ```
-  <source>: In function 'int main()':
-  <source>:627:41: error: static assertion failed: Is a std::string! "(" "<source>" ":" "700" ")" fmt:"print name %s \n"
-    627 |                 static_assert(errorCode != FmtError::ErrorString,                   \
-        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
-  <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
-     24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
-        |                                             ^~~~~~~~~~~~
-  <source>:700:5: note: in expansion of macro 'printf'
-    700 |     printf("print name %s \n", name);
-        |     ^~~~~~
+
+  To compile it:
+  ```
+  g++ -std=gnu++17 main.cpp -o main
+  ```
+
+  When compiling, the result will be:
+  ```
+In file included from main.cpp:3:
+main.cpp: In function ‘int main()’:
+include/printfCheck.h:628:41: error: static assertion failed: Is a std::string! "(" "main.cpp" ":" "8" ")" fmt:"print name %s \n"
+  628 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+      |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
+   25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+      |                                             ^~~~~~~~~~~~
+main.cpp:8:5: note: in expansion of macro ‘printf’
+    8 |     printf("print name %s \n", name);
+      |     ^~~~~~
   ```
 
 ### Too few arguments passed to printf()
