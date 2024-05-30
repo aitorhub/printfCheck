@@ -119,7 +119,7 @@ This case doesn't create an undefined behavior, for that reason is just a warnin
       7 |     printf("Variable size string %.*s \n", "aaa", "array");
   ```
 
-### incompatible precision field combinations given
+### Incompatible precision field combinations given
 
   ```cpp
 #include <stdio.h>
@@ -186,7 +186,7 @@ int main()
 }
   ```
 
-### 
+### Check '%f' floating point field
 
   ```cpp
 #include <stdio.h>
