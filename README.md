@@ -101,9 +101,10 @@ You can obviously use the print-like field checker with other functions differen
 By default, the printfCheck.h checks the functions printf, sprintf(), fprintf() and snprintf().
 
 To add a new trace function to your checks, do the following:
-* Let's say your trace function is called `MYPRINT`
+* Let's say your trace function is called `MYPRINT` and you have more arguments than a normal printf()
 * then, add the following macro, editing directly the printfCheck.h file, or adding it after the #include
 * `#define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)`
+* In the previous MACRO, you should ignore all arguments before the format string
 
   ```cpp
     #include <stdio.h>
