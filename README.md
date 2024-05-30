@@ -10,7 +10,7 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 
 ## Use examples
 
-### printf(): string type not found
+### printf(): '%s' printf field with wrong argument
 
   ```cpp
 #include <stdio.h>
@@ -20,7 +20,7 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 int main()
 {
     const std::string name = "John";
-    printf("print name %s \n", name);
+    printf("print name %s \n", name);  // forget to write name.c_str() 
 }
   ```
 
@@ -89,7 +89,9 @@ main.cpp:7:5: note: in expansion of macro ‘printf’
       174 |         warnFunc( detail::converter<(cond)>() );                \
           |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ```
-  The error line is found in the warning class: "WarningStruct7_0" means the warning is in the line 7
+The error line is found in the warning class: "WarningStruct7_0" means the warning is in the line 7
+
+This case doesn't create an undefined behavior, for that reason is just a warning, not an error.
 
 ### printf() string with precision field but wrong arguments
 
@@ -179,20 +181,40 @@ main.cpp:8:5: note: in expansion of macro ‘printf’
 
 int main()
 {
-    printf("Width trick:   %*d \n", 5, "array but should be integer");
+    printf("Width precision with number: %*d \n", 5, "array but should be integer");
     printf("text counter: %n \n", 10);
 }
   ```
 
-## Compiler compatibility
+### 
 
-* Clang/LLVM >= 5
-* MSVC++ >= 14.11 / Visual Studio >= 2017
-* Xcode >= 10
-* GCC >= 9
-* MinGW >= 9
-* More...
-* x86-64 gcc 9.3 -std=gnu++17
+  ```cpp
+#include <stdio.h>
+#include <string>
+#include "include/printfCheck.h"
+
+int main()
+{
+    printf("Testing: %4.2f \n", 5);
+}
+  ```
+
+Compile it with the floating check option:
+```
+g++ -std=gnu++17 -D ENABLE_CHECK_FLOATING main.cpp -o main
+```
+Other way would be to set the `EnableFloatingCheck` boolean to true in the printfCheck.h header file.
+
+Compile output:
+```
+In file included from main.cpp:3:
+main.cpp: In constructor ‘main()::WarningStruct7_1::WarningStruct7_1()’:
+include/printfCheck.h:179:17: warning: ‘void main()::WarningStruct7_1::warnFunc(detail::false_type)’ is deprecated: Float warning '%.*' "(" "main.cpp" ":" "7" ")" fmt: "Testing: %4.2f \n" [-Wdeprecated-declarations]
+```
+This case is already caught by modern compiler and is disabled in the printCheck.h by default
+
+## Compiler compatibility
+The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available 
 
 ## Licensed under the [MIT License](LICENSE)
 
