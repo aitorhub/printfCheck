@@ -8,6 +8,9 @@ With the use of constexpr and internal macros the printfCheck can find print err
 
 _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 
+## Compiler compatibility
+The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available 
+
 ## Use examples
 
 ### printf(): '%s' printf field with wrong argument
@@ -212,9 +215,6 @@ main.cpp: In constructor ‘main()::WarningStruct7_1::WarningStruct7_1()’:
 include/printfCheck.h:179:17: warning: ‘void main()::WarningStruct7_1::warnFunc(detail::false_type)’ is deprecated: Float warning '%.*' "(" "main.cpp" ":" "7" ")" fmt: "Testing: %4.2f \n" [-Wdeprecated-declarations]
 ```
 This case is already caught by modern compiler and is disabled in the printCheck.h by default
-
-## Compiler compatibility
-The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available 
 
 ## Licensed under the [MIT License](LICENSE)
 
