@@ -117,7 +117,7 @@ main.cpp:7:5: note: in expansion of macro ‘printf’
       7 |     printf("Variable size string %.*s \n", "aaa", "array");
   ```
 
-### incompatible precision fields or field combinations given
+### incompatible precision field combinations given
 
   ```cpp
 #include <stdio.h>
@@ -168,6 +168,20 @@ include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
       |                                             ^~~~~~~~~~~~
 main.cpp:8:5: note: in expansion of macro ‘printf’
     8 |     printf("this is a number %d \n", dummyStr1);
+  ```
+
+### Other error checks that are also caught
+
+  ```cpp
+#include <stdio.h>
+#include <string>
+#include "include/printfCheck.h"
+
+int main()
+{
+    printf("Width trick:   %*d \n", 5, "array but should be integer");
+    printf("text counter: %n \n", 10);
+}
   ```
 
 ## Compiler compatibility
