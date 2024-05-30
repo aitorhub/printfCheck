@@ -18,22 +18,24 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
   
     int main()
     {
-        printf("print name %s \n", 5); 
+        const std::string name = "John";
+        printf("print name %s \n", name);
     }
   ```
   
   When compiling, the result will be:
 
   ```
-      <source>: In function 'int main()':
-      <source>:627:41: error: static assertion failed: Is a std::string! "(" "<source>" ":" "699" ")" fmt:"print name %s \n"
-        627 |                 static_assert(errorCode != FmtError::ErrorString,                   \
-            |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
-      <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
-         24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
-            |                                             ^~~~~~~~~~~~
-      <source>:699:5: note: in expansion of macro 'printf'
-        699 |     printf("print name %s \n", 5);
+  <source>: In function 'int main()':
+  <source>:627:41: error: static assertion failed: Is a std::string! "(" "<source>" ":" "700" ")" fmt:"print name %s \n"
+    627 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
+     24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+        |                                             ^~~~~~~~~~~~
+  <source>:700:5: note: in expansion of macro 'printf'
+    700 |     printf("print name %s \n", name);
+        |     ^~~~~~
   ```
 
 ### Too few arguments passed to printf()
