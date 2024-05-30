@@ -85,6 +85,32 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
   ```
   The error line is found in the warning class: "WarningStruct699_0" means the warning is in the line 699
 
+### printf() string with precision field
+
+  ```cpp
+    #include <stdio.h>
+    #include "printfCheck.h"
+  
+    int main()
+    {
+        printf("Variable size string %.*s \n", "aaa", "array");
+    }
+  ```
+  
+  Compile result:
+  ```
+  <source>: In function 'int main()':
+  <source>:631:41: error: static assertion failed: In '%.*s' the string arguments failed! "(" "<source>" ":" "695" ")" fmt: "Variable size string %.*s \n"
+    631 |                 static_assert(errorCode != FmtError::ErrorCharArray,                \
+        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
+     24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+        |                                             ^~~~~~~~~~~~
+  <source>:695:5: note: in expansion of macro 'printf'
+    695 |     printf("Variable size string %.*s \n", "aaa", "array");
+        |     ^~~~~~
+  ```
+
 ## Compiler compatibility
 
 * Clang/LLVM >= 5
