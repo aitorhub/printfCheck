@@ -8,9 +8,9 @@ With the use of constexpr and internal macros the printfCheck can find print err
 
 _Try it on the [Compiler Explorer](https://godbolt.org/z/8acPeq743)._
 
-## [Features & Examples](example/)
+## Use examples
 
-### printf() string type not found
+### printf(): string type not found
 
   ```cpp
 #include <stdio.h>
@@ -33,7 +33,7 @@ int main()
   ```
 In file included from main.cpp:3:
 main.cpp: In function ‘int main()’:
-include/printfCheck.h:628:41: error: static assertion failed: Is a std::string! "(" "main.cpp" ":" "8" ")" fmt:"print name %s \n"
+include/printfCheck.h:628:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "8" ")" fmt:"print name %s \n"
   628 |                 static_assert(errorCode != FmtError::ErrorString,                   \
       |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
 include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
@@ -56,15 +56,18 @@ main.cpp:8:5: note: in expansion of macro ‘printf’
     }
   ```
   
-  When compiling, the result will be:
-
+  Compile output:
   ```
-    <source>:701:5: note: in expansion of macro 'printf'
-    701 |     printf("TEST: arg %d arg %d \n", 5);
-        |     ^~~~~~
-  <source>:608:43: error: static assertion failed:  Too few arguments. fmt: "TEST: arg %d arg %d \n"
-    608 |             static_assert(FmtFieldCounter <= ArgsSize,                              \
-        |                           ~~~~~~~~~~~~~~~~^~~~~~~~~~~
+In file included from main.cpp:3:
+main.cpp: In function ‘int main()’:
+include/printfCheck.h:609:43: error: static assertion failed:  Too few arguments. fmt: "TEST: arg %d arg %d \n"
+  609 |             static_assert(FmtFieldCounter <= ArgsSize,                              \
+      |                           ~~~~~~~~~~~~~~~~^~~~~~~~~~~
+include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
+   25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+      |                                             ^~~~~~~~~~~~
+main.cpp:7:5: note: in expansion of macro ‘printf’
+    7 |     printf("TEST: arg %d arg %d \n", 5);
   ```
 
 ### Warning: Too much arguments passed
@@ -78,20 +81,17 @@ main.cpp:8:5: note: in expansion of macro ‘printf’
     }
   ```
 
-  Output:
+  Compile output:
   ```
-    <source>: In constructor 'main()::WarningStruct699_0::WarningStruct699_0()':
-    <source>:173:47: warning: 'void main()::WarningStruct699_0::warnFunc(detail::false_type)' is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
-      173 |         warnFunc( detail::converter<(cond)>() );                \
-          |                                               ^
-    ...
-    <source>:699:5: note: in expansion of macro 'printf'
-      699 |     printf("TEST WARN: arg %d \n", 1, 2);
-          |     ^~~~~~
+    In file included from main.cpp:3:
+    main.cpp: In constructor ‘main()::WarningStruct7_0::WarningStruct7_0()’:
+    include/printfCheck.h:174:17: warning: ‘void main()::WarningStruct7_0::warnFunc(detail::false_type)’ is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
+      174 |         warnFunc( detail::converter<(cond)>() );                \
+          |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ```
-  The error line is found in the warning class: "WarningStruct699_0" means the warning is in the line 699
+  The error line is found in the warning class: "WarningStruct7_0" means the warning is in the line 7
 
-### printf() string with precision field
+### printf() string with precision field but wrong arguments
 
   ```cpp
     #include <stdio.h>
@@ -103,18 +103,71 @@ main.cpp:8:5: note: in expansion of macro ‘printf’
     }
   ```
   
-  Compile result:
+  Compile output:
   ```
-  <source>: In function 'int main()':
-  <source>:631:41: error: static assertion failed: In '%.*s' the string arguments failed! "(" "<source>" ":" "695" ")" fmt: "Variable size string %.*s \n"
-    631 |                 static_assert(errorCode != FmtError::ErrorCharArray,                \
+  In file included from main.cpp:3:
+  main.cpp: In function ‘int main()’:
+  include/printfCheck.h:632:41: error: static assertion failed: In '%.*s' the string arguments failed! "(" "main.cpp" ":" "7" ")" fmt: "Variable size string %.*s \n"
+    632 |                 static_assert(errorCode != FmtError::ErrorCharArray,                \
         |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
-  <source>:24:45: note: in expansion of macro 'PRINTF_CHECK'
-     24 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+  include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
+     25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
         |                                             ^~~~~~~~~~~~
-  <source>:695:5: note: in expansion of macro 'printf'
-    695 |     printf("Variable size string %.*s \n", "aaa", "array");
-        |     ^~~~~~
+  main.cpp:7:5: note: in expansion of macro ‘printf’
+      7 |     printf("Variable size string %.*s \n", "aaa", "array");
+  ```
+
+### incompatible precision fields or field combinations given
+
+  ```cpp
+#include <stdio.h>
+#include <string>
+#include "include/printfCheck.h"
+
+int main()
+{
+    printf("WARNING: %hhhd \n");
+    // also produces warnings due to wrong precision fields
+    // printf("WARN: %10.10.10d \n");
+    // printf("%hld \n");
+}
+  ```
+  
+  Compile output:
+  ```
+  In file included from main.cpp:3:
+  main.cpp: In constructor ‘main()::WarningStruct7_2::WarningStruct7_2()’:
+  include/printfCheck.h:174:17: warning: ‘void main()::WarningStruct7_2::warnFunc(detail::false_type)’ is deprecated: fmt fields aren't conformant "WARNING: %hhhd \n" [-Wdeprecated-declarations]
+    174 |         warnFunc( detail::converter<(cond)>() );                \
+        |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ```
+
+### number field given, but string or other argument given
+
+  ```cpp
+#include <stdio.h>
+#include <string>
+#include "include/printfCheck.h"
+
+int main()
+{
+    std::string dummyStr1;
+    printf("this is a number %d \n", dummyStr1);
+}
+  ```
+  
+Compile output:
+  ```
+In file included from main.cpp:3:
+main.cpp: In function ‘int main()’:
+include/printfCheck.h:630:41: error: static assertion failed: It isn't a number! "(" "main.cpp" ":" "8" ")" fmt: "this is a number %d \n"
+  630 |                 static_assert(errorCode != FmtError::ErrorNumber,                   \
+      |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
+   25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+      |                                             ^~~~~~~~~~~~
+main.cpp:8:5: note: in expansion of macro ‘printf’
+    8 |     printf("this is a number %d \n", dummyStr1);
   ```
 
 ## Compiler compatibility
