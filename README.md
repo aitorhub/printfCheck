@@ -29,7 +29,7 @@ int main()
 
   To compile it:
   ```
-  g++ -std=gnu++17 main.cpp -o main
+  g++ -std=gnu++17 -I include/ main.cpp -o main
   ```
 
   When compiling, the result will be:
@@ -95,6 +95,45 @@ main.cpp:7:5: note: in expansion of macro ‘printf’
 The error line is found in the warning class: "WarningStruct7_0" means the warning is in the line 7
 
 This case doesn't create an undefined behavior, for that reason is just a warning, not an error.
+
+### Use trace function different from printf() 
+You can obviously use the print-like field checker with other functions differents from printf.
+By default, the printfCheck.h checks the functions printf, sprintf(), fprintf() and snprintf().
+
+To add a new trace function to your checks, do the following:
+* Let's say your trace function is called `MYPRINT`
+* then, add the following macro, editing directly the printfCheck.h file, or adding it after the #include
+* `#define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)`
+
+  ```cpp
+    #include <stdio.h>
+    #include "printfCheck.h"
+  
+    #define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)
+  
+    int main()
+    {
+         int Index    = 100;
+         int logLevel = 0xf;
+
+         std::string name = "John";
+         MYPRINT(Index, loglevel, "my name is %s \n", 10);
+    }
+  ```
+
+  Compile output:
+  ```
+  In file included from main.cpp:3:
+  main.cpp: In function ‘int main()’:
+  include/printfCheck.h:633:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "13" ")" fmt:"my name is %s \n"
+    633 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  main.cpp:5:41: note: in expansion of macro ‘PRINTF_CHECK’
+      5 | #define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)
+        |                                         ^~~~~~~~~~~~
+  main.cpp:13:9: note: in expansion of macro ‘MYPRINT’
+     13 |         MYPRINT(Index, loglevel, "my name is %s \n", 10);
+  ```
 
 ### printf() string with precision field but wrong arguments
 
@@ -204,7 +243,7 @@ int main()
 
 Compile it with the floating check option:
 ```
-g++ -std=gnu++17 -D ENABLE_CHECK_FLOATING main.cpp -o main
+g++ -std=gnu++17 -D ENABLE_CHECK_FLOATING -I include/ main.cpp -o main
 ```
 Other way would be to set the `EnableFloatingCheck` boolean to true in the printfCheck.h header file.
 
