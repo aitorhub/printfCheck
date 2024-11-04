@@ -255,6 +255,3 @@ main.cpp: In constructor ‘main()::WarningStruct7_1::WarningStruct7_1()’:
 include/printfCheck.h:179:17: warning: ‘void main()::WarningStruct7_1::warnFunc(detail::false_type)’ is deprecated: Float warning '%.*' "(" "main.cpp" ":" "7" ")" fmt: "Testing: %4.2f \n" [-Wdeprecated-declarations]
 ```
 This case is already caught by modern compiler and is disabled in the printCheck.h by default
-
-## Licensed under the [MIT License](LICENSE)
-
