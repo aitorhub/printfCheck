@@ -29,22 +29,23 @@ int main()
 
   To compile it:
   ```
-  g++ -std=gnu++17 -I include/ main.cpp -o main
+  g++ -std=c++17 -I include/ main.cpp -o main
   ```
 
   When compiling, the result will be:
   ```
 In file included from main.cpp:3:
 main.cpp: In function ‘int main()’:
-include/printfCheck.h:628:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "8" ")" fmt:"print name %s \n"
-  628 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+include/printfCheck.h:612:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "8" ")" fmt:"print name %s \n"
+  612 |                 static_assert(errorCode != FmtError::ErrorString,                   \
       |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
-include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
-   25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+include/printfCheck.h:29:45: note: in expansion of macro ‘PRINTF_CHECK’
+   29 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
       |                                             ^~~~~~~~~~~~
-main.cpp:8:5: note: in expansion of macro ‘printf’
-    8 |     printf("print name %s \n", name);
-      |     ^~~~~~
+main.cpp:8:3: note: in expansion of macro ‘printf’
+    8 |   printf("print name %s \n", name);  // forget to write name.c_str()
+      |   ^~~~~~
+...
   ```
 
 ### Too few arguments passed to printf()
@@ -61,16 +62,18 @@ main.cpp:8:5: note: in expansion of macro ‘printf’
   
   Compile output:
   ```
-In file included from main.cpp:3:
+In file included from main.cpp:2:
 main.cpp: In function ‘int main()’:
-include/printfCheck.h:609:43: error: static assertion failed:  Too few arguments. fmt: "TEST: arg %d arg %d \n"
-  609 |             static_assert(FmtFieldCounter <= ArgsSize,                              \
+include/printfCheck.h:593:43: error: static assertion failed:  Too few arguments. fmt: "TEST: arg %d arg %d \n"
+  593 |             static_assert(FmtFieldCounter <= ArgsSize,                              \
       |                           ~~~~~~~~~~~~~~~~^~~~~~~~~~~
-include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
-   25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+include/printfCheck.h:29:45: note: in expansion of macro ‘PRINTF_CHECK’
+   29 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
       |                                             ^~~~~~~~~~~~
-main.cpp:7:5: note: in expansion of macro ‘printf’
-    7 |     printf("TEST: arg %d arg %d \n", 5);
+main.cpp:6:9: note: in expansion of macro ‘printf’
+    6 |         printf("TEST: arg %d arg %d \n", 5);
+      |         ^~~~~~
+...
   ```
 
 ### Warning: Too much arguments passed
@@ -86,13 +89,13 @@ main.cpp:7:5: note: in expansion of macro ‘printf’
 
   Compile output:
   ```
-    In file included from main.cpp:3:
-    main.cpp: In constructor ‘main()::WarningStruct7_0::WarningStruct7_0()’:
-    include/printfCheck.h:174:17: warning: ‘void main()::WarningStruct7_0::warnFunc(detail::false_type)’ is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
-      174 |         warnFunc( detail::converter<(cond)>() );                \
-          |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from main.cpp:2:
+main.cpp: In constructor ‘main()::WarningStruct_LineIs6_other0::WarningStruct_LineIs6_other0()’:
+include/printfCheck.h:155:17: warning: ‘void main()::WarningStruct_LineIs6_other0::warnFunc(detail::false_type)’ is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
+  155 |         warnFunc( detail::converter<(condition)>() );             \
+      |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ```
-The error line is found in the warning class: "WarningStruct7_0" means the warning is in the line 7
+The error line is found in the warning class: "WarningStruct_LineIs6_other0" means the warning is in the line 7
 
 This case doesn't create an undefined behavior, for that reason is just a warning, not an error.
 
@@ -124,16 +127,18 @@ To add a new trace function to your checks, do the following:
 
   Compile output:
   ```
-  In file included from main.cpp:3:
-  main.cpp: In function ‘int main()’:
-  include/printfCheck.h:633:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "13" ")" fmt:"my name is %s \n"
-    633 |                 static_assert(errorCode != FmtError::ErrorString,                   \
-        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
-  main.cpp:5:41: note: in expansion of macro ‘PRINTF_CHECK’
-      5 | #define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)
-        |                                         ^~~~~~~~~~~~
-  main.cpp:13:9: note: in expansion of macro ‘MYPRINT’
-     13 |         MYPRINT(Index, loglevel, "my name is %s \n", 10);
+In file included from main.cpp:2:
+main.cpp: In function ‘int main()’:
+include/printfCheck.h:612:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "12" ")" fmt:"my name is %s \n"
+  612 |                 static_assert(errorCode != FmtError::ErrorString,                   \
+      |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+main.cpp:4:45: note: in expansion of macro ‘PRINTF_CHECK’
+    4 |     #define MYPRINT(index, level, ...)  do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);   }while(0)
+      |                                             ^~~~~~~~~~~~
+main.cpp:12:10: note: in expansion of macro ‘MYPRINT’
+   12 |          MYPRINT(Index, loglevel, "my name is %s \n", 10);
+      |          ^~~~~~~
+      ...
   ```
 
 ### printf() string with precision field but wrong arguments
@@ -150,16 +155,16 @@ To add a new trace function to your checks, do the following:
   
   Compile output:
   ```
-  In file included from main.cpp:3:
-  main.cpp: In function ‘int main()’:
-  include/printfCheck.h:632:41: error: static assertion failed: In '%.*s' the string arguments failed! "(" "main.cpp" ":" "7" ")" fmt: "Variable size string %.*s \n"
-    632 |                 static_assert(errorCode != FmtError::ErrorCharArray,                \
-        |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
-  include/printfCheck.h:25:45: note: in expansion of macro ‘PRINTF_CHECK’
-     25 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
-        |                                             ^~~~~~~~~~~~
-  main.cpp:7:5: note: in expansion of macro ‘printf’
-      7 |     printf("Variable size string %.*s \n", "aaa", "array");
+In file included from main.cpp:2:
+main.cpp: In function ‘int main()’:
+include/printfCheck.h:616:41: error: static assertion failed: In '%.*s' the string arguments failed! "(" "main.cpp" ":" "6" ")" fmt: "Variable size string %.*s \n"
+  616 |                 static_assert(errorCode != FmtError::ErrorCharArray,                \
+      |                               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+include/printfCheck.h:29:45: note: in expansion of macro ‘PRINTF_CHECK’
+   29 | #define printf(...)                     do{ PRINTF_CHECK(__VA_ARGS__); printf(__VA_ARGS__);                    }while(0)
+      |                                             ^~~~~~~~~~~~
+main.cpp:6:9: note: in expansion of macro ‘printf’
+    6 |         printf("Variable size string %.*s \n", "aaa", "array");
   ```
 
 ### Incompatible precision field combinations given
@@ -180,11 +185,10 @@ int main()
   
   Compile output:
   ```
-  In file included from main.cpp:3:
-  main.cpp: In constructor ‘main()::WarningStruct7_2::WarningStruct7_2()’:
-  include/printfCheck.h:174:17: warning: ‘void main()::WarningStruct7_2::warnFunc(detail::false_type)’ is deprecated: fmt fields aren't conformant "WARNING: %hhhd \n" [-Wdeprecated-declarations]
-    174 |         warnFunc( detail::converter<(cond)>() );                \
-        |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from main.cpp:3:
+main.cpp: In constructor ‘main()::WarningStruct_LineIs7_other2::WarningStruct_LineIs7_other2()’:
+include/printfCheck.h:155:17: warning: ‘void main()::WarningStruct_LineIs7_other2::warnFunc(detail::false_type)’ is deprecated: fmt fields aren't conformant "WARNING: %hhhd \n" [-Wdeprecated-declarations]
+  155 |         warnFunc( detail::converter<(condition)>() );             \
   ```
 
 ### number field given, but string or other argument given
@@ -244,14 +248,15 @@ int main()
 
 Compile it with the floating check option:
 ```
-g++ -std=gnu++17 -D ENABLE_CHECK_FLOATING -I include/ main.cpp -o main
+g++ -std=c++17 -D ENABLE_CHECK_FLOATING -I include/ main.cpp -o main
 ```
 Other way would be to set the `EnableFloatingCheck` boolean to true in the printfCheck.h header file.
 
 Compile output:
 ```
 In file included from main.cpp:3:
-main.cpp: In constructor ‘main()::WarningStruct7_1::WarningStruct7_1()’:
-include/printfCheck.h:179:17: warning: ‘void main()::WarningStruct7_1::warnFunc(detail::false_type)’ is deprecated: Float warning '%.*' "(" "main.cpp" ":" "7" ")" fmt: "Testing: %4.2f \n" [-Wdeprecated-declarations]
+main.cpp: In constructor ‘main()::WarningStruct_LineIs7_other1::WarningStruct_LineIs7_other1()’:
+include/printfCheck.h:155:17: warning: ‘void main()::WarningStruct_LineIs7_other1::warnFunc(detail::false_type)’ is deprecated: Float warning '%.*' "(" "main.cpp" ":" "7" ")" fmt: "Testing: %4.2f \n" [-Wdeprecated-declarations]
+  155 |         warnFunc( detail::converter<(condition)>() );             \
 ```
 This case is already caught by modern compiler and is disabled in the printCheck.h by default
