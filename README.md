@@ -88,13 +88,13 @@ main.cpp:6:9: note: in expansion of macro ‘printf’
   ```
 
   Compile output:
-  ```
+```
 In file included from main.cpp:2:
 main.cpp: In constructor ‘main()::WarningStruct_LineIs6_other0::WarningStruct_LineIs6_other0()’:
 include/printfCheck.h:155:17: warning: ‘void main()::WarningStruct_LineIs6_other0::warnFunc(detail::false_type)’ is deprecated: Arguments mismatch fmt: "TEST WARN: arg %d \n" [-Wdeprecated-declarations]
   155 |         warnFunc( detail::converter<(condition)>() );             \
       |         ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ```
+```
 The error line is found in the warning class: "WarningStruct_LineIs6_other0" means the warning is in the line 7
 
 This case doesn't create an undefined behavior, for that reason is just a warning, not an error.
@@ -126,7 +126,7 @@ To add a new trace function to your checks, do the following:
   ```
 
   Compile output:
-  ```
+```
 In file included from main.cpp:2:
 main.cpp: In function ‘int main()’:
 include/printfCheck.h:612:41: error: static assertion failed: It isn't a char* ! "(" "main.cpp" ":" "12" ")" fmt:"my name is %s \n"
@@ -138,7 +138,7 @@ main.cpp:4:45: note: in expansion of macro ‘PRINTF_CHECK’
 main.cpp:12:10: note: in expansion of macro ‘MYPRINT’
    12 |          MYPRINT(Index, loglevel, "my name is %s \n", 10);
       |          ^~~~~~~
-  ```
+```
 
 ### printf() string with precision field but wrong arguments
 
