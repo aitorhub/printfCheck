@@ -138,7 +138,6 @@ main.cpp:4:45: note: in expansion of macro ‘PRINTF_CHECK’
 main.cpp:12:10: note: in expansion of macro ‘MYPRINT’
    12 |          MYPRINT(Index, loglevel, "my name is %s \n", 10);
       |          ^~~~~~~
-      ...
   ```
 
 ### printf() string with precision field but wrong arguments
