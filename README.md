@@ -6,7 +6,7 @@ by Aitor Folgoso <aitor.folgoso@gmail.com>
 Header-only C++-17 file to check the printf() and printf-like trace functions at compile-time.
 With the use of constexpr and internal macros the printfCheck can find print errors with cause undefined behaviour or crashes, being able to detect and fix them.
 
-_Try it on the [Compiler Explorer](https://godbolt.org/z/WKzbT1YEM)._
+_Try it on the [Compiler Explorer](https://godbolt.org/z/oo7f646nv)._
 
 ## Compiler compatibility
 The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available 
