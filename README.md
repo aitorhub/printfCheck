@@ -11,7 +11,8 @@ With the use of constexpr and internal macros the printfCheck can find print err
 _Try it on the [Compiler Explorer](https://godbolt.org/z/oo7f646nv)._
 
 ## Compiler compatibility
-The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available 
+The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available.
+Works with gcc 8.1 and higher.
 
 ## Use examples
 
