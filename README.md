@@ -1,4 +1,6 @@
 [![GitHub license](https://img.shields.io/badge/C%2B%2B-17-blue)](https://en.cppreference.com/w/cpp/compiler_support#cpp17)
+[![License](https://img.shields.io/github/license/Neargye/magic_enum.svg)](LICENSE)
+[![Compiler explorer](https://img.shields.io/badge/compiler_explorer-online-blue.svg)](https://godbolt.org/z/WKzbT1YEM)
 
 # printfCheck
 by Aitor Folgoso <aitor.folgoso@gmail.com>
@@ -27,7 +29,8 @@ int main()
 }
   ```
 
-  To compile it:
+  To compile it: 
+  In my example the printfCheck.h file is inside the include/ dir. Otherwise add the corresponding include header path
   ```
   g++ -std=c++17 -I include/ main.cpp -o main
   ```
