@@ -1,3 +1,4 @@
+
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2019 - 2024 Aitor Folgoso <aitor.folgoso@gmail.com>.
@@ -595,7 +596,7 @@ constexpr_for_check_Field (F func)
 /**             PRINTF_CHECK                **/
 /** *************************************** **/
 #define  PRINTF_CHECK(fmt_literal, ...)                do{                          \
-            constexpr std::string_view fmt = fmt_literal;                           \
+            constexpr uint32_t FmtSize = sizeof(fmt_literal) - 1;                   \
                                                                                     \
             constexpr int ArgsSize = GET_ARG_COUNT(__VA_ARGS__);                    \
                                                                                     \
@@ -604,10 +605,10 @@ constexpr_for_check_Field (F func)
             /** ************************************************ **/                \
             constexpr                                                               \
             int FmtFieldCounter =                                                   \
-                constexpr_for_arg_counter<0, fmt.size()>(                           \
-                        [&fmt](uint32_t Index)                                      \
+                constexpr_for_arg_counter<0, FmtSize>(                              \
+                        [](uint32_t Index)                                          \
                         {                                                           \
-                            return getFieldIndices(fmt, Index);                     \
+                            return getFieldIndices(fmt_literal, Index);             \
                         }                                                           \
                     );                                                              \
                                                                                     \
@@ -622,10 +623,10 @@ constexpr_for_check_Field (F func)
             /** ************************************************ **/                \
             constexpr                                                               \
             auto errorCode =                                                        \
-            constexpr_for_check_Field<0, fmt.size(), 0, TupleArgsType>(             \
-                    [&fmt](uint32_t Index)                                          \
+            constexpr_for_check_Field<0, FmtSize, 0, TupleArgsType>(                \
+                    [](uint32_t Index)                                              \
                     {                                                               \
-                        return getFieldIndices(fmt, Index);                         \
+                        return getFieldIndices(fmt_literal, Index);                 \
                     }                                                               \
                 );                                                                  \
             if(errorCode != FmtError::NoError)                                      \
@@ -666,10 +667,10 @@ constexpr_for_check_Field (F func)
             {                                                                       \
                 constexpr                                                           \
                 auto warningCode =                                                  \
-                constexpr_for_valididy<0, fmt.size()>(                              \
-                            [&fmt](uint32_t Index)                                  \
+                constexpr_for_valididy<0, FmtSize>(                                 \
+                            [](uint32_t Index)                                      \
                             {                                                       \
-                                return getFieldIndicesWithoutCheck(fmt, Index);     \
+                                return getFieldIndicesWithoutCheck(fmt_literal, Index);     \
                             }                                                       \
                         );                                                          \
                                                                                     \
@@ -689,7 +690,7 @@ constexpr_for_check_Field (F func)
 #define FMT_DEBUG_ERROR_STRING             0
 #define FMT_DEBUG_ERROR_NUMBER             0
 #define FMT_DEBUG_ERROR_VARIABLE_STRING    0
-#define FMT_DEBUG_VALIDITY_CHECK           0
+#define FMT_DEBUG_WARN_VALIDITY_CHECK      0
 #define FMT_DEBUG_ERROR_VARIABLE_WIDTH     0
 #define FMT_DEBUG_ERROR_FIELD_N            0
 #define FMT_DEBUG_WARNING_FLOAT_FIELD      0
@@ -728,7 +729,7 @@ int main()
     TRACEPRINT(1, LOG_DEBUG, "Width trick 2: %*d \n", "aaa", 10);
     #endif
 
-    #if FMT_DEBUG_VALIDITY_CHECK == 1
+    #if FMT_DEBUG_WARN_VALIDITY_CHECK == 1
     TRACEPRINT(1, LOG_DEBUG, "WARN: %hhhd \n");
     TRACEPRINT(1, LOG_DEBUG, "WARN: %10.10.10d \n");
     TRACEPRINT(1, LOG_DEBUG, "%hld \n");
