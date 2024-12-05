@@ -12,7 +12,7 @@ _Try it on the [Compiler Explorer](https://godbolt.org/z/oo7f646nv)._
 
 ## Compiler compatibility
 The code must be compiled with C++17 or higher, where `constexpr` keyword and `std::string_view` class are available.
-Works with gcc 8.1 and higher.
+Works with gcc 8.1 and higher, and clang 12.0.0 and above.
 
 ## Use examples
 
